@@ -60,6 +60,6 @@ Bản xuất sau cùng gồm [Bảng A](../../submission/D13-2A202603280-bangA.c
 
 Hộp 3D đo bằng mét cho mô hình biết vị trí và kích thước vật thể trong không gian của xe. Với vật thưa điểm, việc kéo dài hộp ra ngoài phần quan sát được có thể đưa sai số vào chính kích thước mà mô hình dùng làm mục tiêu học. Với dữ liệu của mình, phần tôi còn chưa chắc nhất là hộp đã bao hết vật bị che khuất hay chưa.
 
-- **Công cụ:** Codex.
-- **Nội dung trao đổi:** thiết lập CVAT, tăng độ sáng điểm LiDAR, chiếu cuboid lên camera và theo dõi các checkpoint.
-- **Cách sử dụng:** hỗ trợ hiển thị khi chỉnh hộp, sắp xếp và đặt tên ảnh chụp đã gửi, đồng bộ tệp CSV, biên tập báo cáo từ ghi chú thực hành và chuẩn bị bản nộp.
+- **Công cụ:** Codex; Claude Code (đối chiếu báo cáo với quy định và chạy `check_submission.py`).
+- **Nội dung trao đổi:** thiết lập CVAT, tăng độ sáng điểm LiDAR, chiếu cuboid lên camera, theo dõi các checkpoint và rà các mục báo cáo còn thiếu.
+- **Cách sử dụng:** hỗ trợ hiển thị khi chỉnh hộp, sắp xếp và đặt tên ảnh chụp đã gửi, đồng bộ tệp CSV, biên tập báo cáo từ ghi chú thực hành và chuẩn bị bản nộp. Claude Code không xem ảnh camera, ảnh chụp màn hình và không đọc bảng A để điền số; các số ở mục 5 do tôi tự đọc.
