@@ -77,7 +77,15 @@ Mật độ theo khoảng cách (4 cuboid ở các `dist_m` khác nhau):
 |---|---|---|
 | TODO(học viên) | | |
 
-TODO(học viên): một câu quy luật ("xa gấp … lần thì số điểm còn khoảng …") và so với đường cong ở slide bài giảng (xe con: khoảng 1968 điểm ở 0–10 m, 718 ở 10–20 m, 214 ở 20–30 m, 72 ở 30–40 m, 19 ở 60–80 m). Rồi phần tự kiểm: hai cuboid bạn **đã sửa** sau `preview` / `selfcheck` (frame, idx, sửa gì), và những cảnh báo bạn **giữ nguyên** kèm lý do.
+TODO(học viên): một câu quy luật ("xa gấp … lần thì số điểm còn khoảng …") và so với đường cong ở slide bài giảng (xe con: khoảng 1968 điểm ở 0–10 m, 718 ở 10–20 m, 214 ở 20–30 m, 72 ở 30–40 m, 19 ở 60–80 m).
+
+**Kết quả tự kiểm trên CVAT**
+
+Tôi đã kiểm tra lại tất cả các cảnh báo CP7. Với các hộp có kích thước hơi vượt khoảng tham khảo, góc nhìn bị che khiến tôi chỉ thấy một phần vật thể trên point cloud. Tôi phải ước lượng phần bị khuất nên chưa chắc hộp đã bao hết vật.
+
+Tôi đã kiểm tra và chỉnh lại hộp Cyclist ở frame `s04f51` (idx 12 trong phiếu trước khi sửa) sau cảnh báo đáy hộp lơ lửng.
+
+TODO(học viên): ghi frame, idx và thay đổi của cuboid thứ hai nếu đã sửa.
 
 TODO(học viên): đổi kiểm: MSSV người đã kiểm chéo với bạn, hai con số nào được đối chiếu với bảng A, khớp hay lệch (lệch thì đã sửa gì).
 
