@@ -1,100 +1,65 @@
 # Báo cáo Day 13 — Trần Anh Tùng, 2A202603280
 
-## 1. Kết luận trước
+## 1. Kết quả gán nhãn
 
-Task `D13-2A202603280`, Job 28. Môi trường thực hành gồm macOS, Google Chrome và CVAT 2.81.0.
+Task `D13-2A202603280`, Job 28, gồm 10 frame LiDAR với 7 góc camera cho mỗi frame. Kết quả kiểm tra bản xuất cuối là **92 cuboid**. Frame đầu có 12 hộp; frame ít nhất là `s01f31` với 5 hộp. Cả 10 frame đạt số hộp tối thiểu của lab. Sau lần chỉnh hộp Cyclist, số cuboid có cảnh báo giảm từ 5 xuống 4.
 
-Các frame theo thứ tự trong CVAT (0–9): `s01f09`, `s01f31`, `s02f16`, `s02f51`, `s03f11`, `s03f56`, `s04f30`, `s04f51`, `s05f14`, `s05f35`.
+| Sequence | Frame thứ nhất | Số hộp | Frame thứ hai | Số hộp |
+|---|---|---:|---|---:|
+| 01 | `s01f09` | 12 | `s01f31` | 5 |
+| 02 | `s02f16` | 9 | `s02f51` | 6 |
+| 03 | `s03f11` | 9 | `s03f56` | 9 |
+| 04 | `s04f30` | 12 | `s04f51` | 12 |
+| 05 | `s05f14` | 12 | `s05f35` | 6 |
 
-TODO(học viên): MSSV người ngồi cạnh; tổng bao nhiêu cuboid, frame nào ít nhất và vì sao; `selfcheck` cờ bao nhiêu cuboid trên tổng số; bạn tin phần nào nhất và phần nào còn yếu nhất (hướng, đáy, kích thước, class, vật xa).
+Môi trường thực hành gồm macOS, Chrome và CVAT 2.81.0. Các hộp được vẽ bằng **Shape** trên từng frame. Khung Top dùng để căn tâm, chiều dài, chiều rộng và hướng. Hai khung Side và Front dùng để kiểm tra chiều cao và vị trí đáy. Job 28 có lớp chiếu cuboid lên ảnh camera để đối chiếu khi chỉnh hộp.
 
-Trong khung 3D, kéo chuột trái để xoay, kéo chuột phải để dời và cuộn để phóng to vùng cần xem.
-Để đặt cuboid, chọn lớp và Shape, nháy đúp vào cụm điểm rồi chỉnh tâm và hướng ở Top, đáy và chiều cao ở Side và Front.
-Bật Cuboid orientation để kiểm tra hướng. Job 28 có lớp chiếu cuboid trực tiếp lên camera; lệnh `preview` của lab dùng để xem lại hộp đã lưu.
+## 2. Đọc point cloud và đối chiếu camera
 
-## 2. Đọc frame (Bước 2)
+Gốc tọa độ ở tâm LiDAR trên nóc xe. Trong hệ VF, **−y** hướng về trước xe, **+x** sang trái xe, **+y** ra sau và **+z** hướng lên. Khi xoay khung 3D, có thể đối chiếu với cam01 nhìn về trước hoặc cam09 nhìn về sau để xác định hướng của ảnh chụp. [Quy ước tọa độ VF](../../docs/COORDINATES.md)
 
-Ảnh của hai frame đọc kỹ: `t1-s01f09-3d.png`, `t1-s01f09-top.png`, `t1-s01f31-3d.png`, `t1-s01f31-top.png`.
+| Frame đọc kỹ | Ảnh nhìn nghiêng | Ảnh nhìn từ trên xuống | Đối tượng có minh chứng |
+|---|---|---|---|
+| `s01f09` | `t1-s01f09-3d.png` | `t1-s01f09-top.png` | Xe con và xe tải được chọn làm mẫu ở mục 3. |
+| `s01f31` | `t1-s01f31-3d.png` | `t1-s01f31-top.png` | Hai ảnh ghi lại cùng một frame ở hai góc nhìn. |
 
-| Frame | Phía trước xe ở cạnh nào của ảnh nhìn từ trên xuống; +x, +y chỉ về đâu | Mặt đường (phẳng/dốc; thấp hơn LiDAR ~ m) | Vật xa nhất đọc được (~ m) | Loại vật thấy | Vật phía sau / hai bên | Cụm chưa đọc được |
-|---|---|---|---|---|---|---|
-| `s01f09` | TODO(học viên) | | | | | |
-| `s01f31` | TODO(học viên) | | | | | |
+Camera cung cấp màu sắc, hình dáng bên ngoài và dấu hiệu phân biệt đầu với đuôi xe. LiDAR cung cấp vị trí trong không gian, kích thước theo mét và độ cao so với mặt đường. Trong các frame đã xem, tôi vẫn nhận ra trên point cloud những vật nhìn rõ trên camera, kể cả một số vật ở xa. Hướng cụ thể trên mép từng ảnh, độ dốc, tầm xa nhất và các cụm chưa nhận diện chưa có ghi chép riêng cho từng frame.
 
-TODO(học viên): 3 điều **chỉ camera** cho biết và 3 điều **chỉ LiDAR** cho biết, lấy từ chính hai frame trên.
+## 3. Ba cuboid mẫu
 
-Tám frame lướt:
+| Vật | Frame | Class trên CVAT | Ảnh minh chứng trong ZIP |
+|---|---|---|---|
+| Xe con | `s01f09` | `Car` | `t2-a-car.png` |
+| Xe tải | `s01f09` | `Truck` | `t2-b-bus-truck.png` |
+| Xe hai bánh có người điều khiển | `s04f30` | `Cyclist` | `t2-c-ped-cyclist.png` |
 
-| Frame | Phía trước ở cạnh nào của ảnh nhìn từ trên xuống | Điều lạ (nếu có) |
+Ở hai mẫu xe, tiêu chí kiểm tra hướng là vạch đỏ dọc thân hộp chỉ về đầu xe. Ở mẫu Cyclist, phạm vi hộp gồm cả người điều khiển và xe. Góc nhìn ngang cho phép kiểm tra đáy hộp sau khi đã căn đúng hình chiếu từ trên xuống. Chưa có bản ghi đối chiếu riêng từng mẫu với bảng kích thước 4.3 hoặc kết quả vòng hiệu chuẩn chung. [Quy tắc cuboid và bảng 4.3](../../docs/GUIDELINE.md)
+
+## 4. Hiện tượng ảnh hưởng đến gán nhãn
+
+Ba ảnh dưới đây đều lấy từ task cá nhân `D13-2A202603280`. Cột cuối ghi cách xử lý theo guideline. Nguyên nhân vật lý của từng hiện tượng chưa được xác minh.
+
+| Hiện tượng | Frame và bằng chứng | Hệ quả khi gán nhãn |
 |---|---|---|
-| `s02f16` | TODO(học viên) | |
-| `s02f51` | TODO(học viên) | |
-| `s03f11` | TODO(học viên) | |
-| `s03f56` | TODO(học viên) | |
-| `s04f30` | TODO(học viên) | |
-| `s04f51` | TODO(học viên) | |
-| `s05f14` | TODO(học viên) | |
-| `s05f35` | TODO(học viên) | |
+| Bóng che | `s03f11` · `t4-1-bong-che.png` | Với vật bị che một phần, dùng thuộc tính occluded và chỉ ước lượng phần khuất khi có đủ căn cứ. |
+| Thưa ở xa | `s01f09` · `t4-2-thua-o-xa.png` | Vật ở xa có thể vẫn nhận diện được. Khi các điểm chưa đủ để xác định phạm vi hộp, ghi nhận LOW_VISIBILITY. |
+| Phản xạ thấp hoặc ít điểm bất thường | Tôi chưa xác định được ví dụ rõ trong các frame đã xem. Mục này chưa có ảnh minh chứng. | Số điểm còn phụ thuộc khoảng cách và mức độ che khuất. Chưa đủ căn cứ quy phần thiếu điểm cho đặc tính bề mặt. |
+| Điểm lạ | `s03f11` · `t4-4-diem-la.png` | Một cụm điểm lẻ cần được đối chiếu ở nhiều góc trước khi xác định có vật thể tại đó. |
 
-## 3. Ba cuboid có hướng dẫn (Bước 3)
+## 5. Số đo và kết quả tự kiểm
 
-Ảnh: `t2-a-car`, `t2-b-bus-truck`, `t2-c-ped-cyclist`.
+Bản xuất sau cùng gồm [Bảng A](../../submission/D13-2A202603280-bangA.csv) và [phiếu tự kiểm](../../submission/D13-2A202603280-tukiem.csv). Hai bảng đối chiếu theo cặp `(frame, idx)`. Bảng A lưu kích thước, vị trí và góc hướng của từng hộp; phiếu tự kiểm lưu số điểm bên trong, khoảng hở ước tính với mặt đường và cảnh báo.
 
-| Vật | Frame, idx | Class | Mũi tên yaw đúng hướng? | Đáy chạm đường? | Đã kiểm Top/Side/Front + ảnh? | Kích thước trong bảng 4.3? |
-|---|---|---|---|---|---|---|
-| (a) xe con gần | `s01f09`, idx TODO(học viên) | Car | | | | |
-| (b) xe buýt hoặc xe tải | `s01f09`, idx TODO(học viên) | Truck | | | | |
-| (c) người đi bộ hoặc xe hai bánh | `s04f30`, idx TODO(học viên) | Cyclist | | | | |
+**Hộp Cyclist đã sửa:** tại frame `s04f51`, hộp `idx 12` có cảnh báo đáy lơ lửng. Tôi đã kiểm tra và chỉnh lại hộp trong CVAT. Sau khi Save và xuất lại bằng `sync`, phiếu mới không còn cảnh báo ở hộp này. Mẫu Cyclist chụp ở mục 3 thuộc frame `s04f30`.
 
-TODO(học viên): vòng hiệu chuẩn: cuboid của bạn lệch so với các bạn ở điểm nào, cả lớp chốt cách hiểu guideline nào? Và các vật bạn **bỏ qua vì không đủ cơ sở** (frame, vị trí, mô tả, loại nghi vấn như UNCERTAIN_CLASS / LOW_VISIBILITY), hoặc ghi "không có".
+**Các cảnh báo còn lại:** tôi đã kiểm tra lại toàn bộ các hộp bị cờ. Với những hộp có kích thước hơi vượt khoảng tham khảo, góc nhìn bị che khiến chỉ một phần vật thể có điểm LiDAR. Vì thế biên phía khuất vẫn có sai số khi ước lượng.
 
-## 4. Bốn hiện tượng chất lượng (Bước 4)
+Độ cao đáy hộp được tính bằng `z − height/2` (m). Khoảng cách ngang `dist_m` được tính từ x và y; khoảng cách không gian `r` tính thêm z. Phần phân tích cá nhân chưa có bảng đối chiếu ba giá trị đáy, hai hộp gần nhất và xa nhất, kích thước theo bảng 4.3, yaw của xe hai chiều hoặc mật độ ở bốn khoảng cách. Chưa có thông tin nhận diện lần sửa thứ hai hay biên bản kiểm chéo hai số với bạn cùng lớp.
 
-Nguyên nhân ghi là **giả thuyết**. Frame mượn thì ghi rõ nguồn: task chung, hoặc MSSV của bạn cho mượn.
+## 6. Ý nghĩa của nhãn và cách dùng AI
 
-| Hiện tượng | Frame / tên ảnh / nguồn | Nguyên nhân (giả thuyết) | Thấy gì trên point cloud | Hệ quả khi gán (theo guideline) |
-|---|---|---|---|---|
-| 1. Bóng che | `s03f11` · task cá nhân D13-2A202603280 · `t4-1-bong-che.png` | | | |
-| 2. Thưa ở xa | `s01f09` · task cá nhân D13-2A202603280 · `t4-2-thua-o-xa.png` | | | |
-| 3. Phản xạ thấp / ít điểm bất thường | Chưa có ảnh minh chứng | | Trong các frame đã xem, các vật thấy rõ trên camera vẫn nhận ra được trên point cloud, kể cả ở xa. | |
-| 4. Điểm lạ | `s03f11` · task cá nhân D13-2A202603280 · `t4-4-diem-la.png` | | | |
+Hộp 3D đo bằng mét cho mô hình biết vị trí và kích thước vật thể trong không gian của xe. Với vật thưa điểm, việc kéo dài hộp ra ngoài phần quan sát được có thể đưa sai số vào chính kích thước mà mô hình dùng làm mục tiêu học. Với dữ liệu của mình, phần tôi còn chưa chắc nhất là hộp đã bao hết vật bị che khuất hay chưa.
 
-## 5. Số từ cuboid của tôi (Bước 5)
-
-Lấy từ `submission/D13-2A202603280-bangA.csv`; số điểm lấy từ cột `points_in` của `-tukiem.csv`. Mặt đường khoảng −1,7 m: z đáy lệch hơn 0,3 m là lơ lửng hoặc chìm.
-
-| Cuboid (frame, idx, class) | z | h | z đáy = z − h/2 | dist_m | r = √(x²+y²+z²) | yaw_deg | Nhận xét (lơ lửng / chìm / chạm đường) |
-|---|---|---|---|---|---|---|---|
-| TODO(học viên) | | | | | | | |
-| TODO(học viên) | | | | | | | |
-| TODO(học viên) | | | | | | | |
-
-TODO(học viên): (a) cuboid **gần nhất** và **xa nhất**: `dist_m` và r của từng cái. (b) Kích thước l, w, h của một người đi bộ (hoặc xe hai bánh) và một xe con so với bảng 4.3: chiều nào ngoài khoảng, vì sao. (c) `yaw_deg` của một xe cùng chiều phía trước và một xe ngược chiều (nếu có): có gần 270° và 90° không.
-
-Mật độ theo khoảng cách (4 cuboid ở các `dist_m` khác nhau):
-
-| Cuboid (frame, idx, class) | dist_m | Số điểm (`points_in`) |
-|---|---|---|
-| TODO(học viên) | | |
-
-TODO(học viên): một câu quy luật ("xa gấp … lần thì số điểm còn khoảng …") và so với đường cong ở slide bài giảng (xe con: khoảng 1968 điểm ở 0–10 m, 718 ở 10–20 m, 214 ở 20–30 m, 72 ở 30–40 m, 19 ở 60–80 m).
-
-**Kết quả tự kiểm trên CVAT**
-
-Tôi đã kiểm tra lại tất cả các cảnh báo CP7. Với các hộp có kích thước hơi vượt khoảng tham khảo, góc nhìn bị che khiến tôi chỉ thấy một phần vật thể trên point cloud.
-
-Tôi đã kiểm tra và chỉnh lại hộp Cyclist ở frame `s04f51` (idx 12 trong phiếu trước khi sửa) sau cảnh báo đáy hộp lơ lửng.
-
-TODO(học viên): ghi frame, idx và thay đổi của cuboid thứ hai nếu đã sửa.
-
-TODO(học viên): đổi kiểm: MSSV người đã kiểm chéo với bạn, hai con số nào được đối chiếu với bảng A, khớp hay lệch (lệch thì đã sửa gì).
-
-## 6. Ý nghĩa của nhãn, cách dùng AI và điều còn chưa chắc
-
-TODO(học viên): giải thích việc dùng mét cho nhãn 3D và cách xử lý vật thưa điểm từ góc nhìn của mô hình.
-
-- Công cụ AI đã dùng: Codex.
-- Nội dung trao đổi: thiết lập CVAT, tăng độ sáng điểm LiDAR, chiếu cuboid lên camera và theo dõi các checkpoint.
-- Cách dùng kết quả: áp dụng lớp hiển thị trực tiếp khi chỉnh cuboid, gửi ảnh chụp để hỗ trợ đặt tên và sắp xếp, chuẩn bị tệp nộp bài.
-
-Với những vật bị che khuất, tôi phải ước lượng phần không có đủ điểm LiDAR. Tôi còn chưa chắc hộp đã bao hết phần vật bị khuất.
+- **Công cụ:** Codex.
+- **Nội dung trao đổi:** thiết lập CVAT, tăng độ sáng điểm LiDAR, chiếu cuboid lên camera và theo dõi các checkpoint.
+- **Cách sử dụng:** hỗ trợ hiển thị khi chỉnh hộp, sắp xếp và đặt tên ảnh chụp đã gửi, đồng bộ tệp CSV, biên tập báo cáo từ ghi chú thực hành và chuẩn bị bản nộp.
