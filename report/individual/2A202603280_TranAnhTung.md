@@ -81,7 +81,7 @@ TODO(học viên): một câu quy luật ("xa gấp … lần thì số điểm 
 
 **Kết quả tự kiểm trên CVAT**
 
-Tôi đã kiểm tra lại tất cả các cảnh báo CP7. Với các hộp có kích thước hơi vượt khoảng tham khảo, góc nhìn bị che khiến tôi chỉ thấy một phần vật thể trên point cloud. Tôi phải ước lượng phần bị khuất nên chưa chắc hộp đã bao hết vật.
+Tôi đã kiểm tra lại tất cả các cảnh báo CP7. Với các hộp có kích thước hơi vượt khoảng tham khảo, góc nhìn bị che khiến tôi chỉ thấy một phần vật thể trên point cloud.
 
 Tôi đã kiểm tra và chỉnh lại hộp Cyclist ở frame `s04f51` (idx 12 trong phiếu trước khi sửa) sau cảnh báo đáy hộp lơ lửng.
 
@@ -97,4 +97,4 @@ TODO(học viên): giải thích việc dùng mét cho nhãn 3D và cách xử l
 - Nội dung trao đổi: thiết lập CVAT, tăng độ sáng điểm LiDAR, chiếu cuboid lên camera và theo dõi các checkpoint.
 - Cách dùng kết quả: áp dụng lớp hiển thị trực tiếp khi chỉnh cuboid, gửi ảnh chụp để hỗ trợ đặt tên và sắp xếp, chuẩn bị tệp nộp bài.
 
-TODO(học viên): điều còn chưa chắc hoặc lỗi phát hiện sau hạn, nếu có.
+Với những vật bị che khuất, tôi phải ước lượng phần không có đủ điểm LiDAR. Tôi còn chưa chắc hộp đã bao hết phần vật bị khuất.
